@@ -52,6 +52,6 @@ python twee2docx.py --distanza 12 --distanza-max 30 --correzione 100 --tentativi
 
 200 capitoli su un Intel P9
 
-Rinumerazione completata.
-Statistica finale (dopo tutte le fasi): Distanza media: 29.16, Distanza massima: 164
+Rinumerazione completata.  
+Statistica finale (dopo tutte le fasi): Distanza media: 29.16, Distanza massima: 164  
 Tempo di esecuzione totale: 21.93 secondi.
