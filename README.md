@@ -25,13 +25,30 @@ Cosa fa: indica il nome del file .twee da elaborare (senza l’estensione).
 Default: se il parametro è omesso usa il primo .twee trovato nella cartella.
 
 --distanza <numero>
-Cosa fa: ove possibile imposta la distanza minima (in capitoli) tra un nodo e i suoi collegamenti. Se fallisce dà un warning a console
+Cosa fa: ove possibile imposta la distanza minima (in capitoli) tra un nodo e i suoi collegamenti. Se fallisce dà un warning a console.
 Default: se il parametro è omesso, 5
 
 --lock <numeri_dei_capitoli>
-Cosa fa: blocca uno o più capitoli,
+Cosa fa: blocca uno o più capitoli e ne impedisce in rimescolamento.
 Formato: lista separata da virgole o spazi, ad esempio: --lock 1 3 10 o --lock 1,3,10
 Default: se il parametro è omesso, viene bloccato solo il primo capitolo.
+
+--distanza-max <numero>
+Cosa fa: setta la distanza massima accettabile tra due link. Oltre questa soglia il risultato viene considerato non accettabile e viene eseguito un ricalcolo fino al raggiungimento dell'obiettivo o del parametro --tentativi
+Default: se il parametro è omesso, 
+
+--tentativi <numero>
+Cosa fa: numero di bozze iniziali di rimescolamento. La migliore verrà scelta per la rifinitura
+Default: se il parametro è omesso, il default è 1
+
+--rifinitura <numero>
+Cosa fa: i collegamenti tra capitoli vengono analizzati per capise se si possono avvicinare tra loro.
+Default: se il parametro è omesso, il default è 1
+
+--inizio <numero>
+Cosa fa: permette di iniziare la nunmerazione da un numero custom.
+Utile in caso il libro sia diviso in parti.
+Default: se il parametro è omesso, la rifinitura è disattivata
 
 --debug
 Cosa fa: attiva la modalità debug.
