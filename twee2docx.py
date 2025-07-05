@@ -96,10 +96,10 @@ def _targeted_correction(id_map, links_graph, non_locked_ids, min_dist, max_dist
         
         violating_links = [link for link in all_links if link['dist'] > max_dist]
         if not violating_links:
-            print(f"Passata {p+1}: Nessuna violazione di distanza massima trovata. Correzione completata.")
+            print(f"  -> Passata {p+1}/{passes}: Nessuna violazione trovata. Correzione completata.          ", end='\n')
             break
             
-        print(f"Passata {p+1}: Trovate {len(violating_links)} violazioni. Tento di risolverle...")
+        print(f"  -> Passata {p+1}/{passes}: Trovate {len(violating_links)} violazioni. Tento di risolverle...", end='\r')
         
         violating_links.sort(key=lambda x: x['dist'], reverse=True)
         
@@ -154,9 +154,8 @@ def _targeted_correction(id_map, links_graph, non_locked_ids, min_dist, max_dist
                 id_map[node_to_move], id_map[best_swap_candidate] = pos2, pos1
                 corrections_made += 1
 
-        print(f"  -> Fine passata {p+1}. Eseguite {corrections_made} correzioni mirate.")
         if corrections_made == 0:
-            print("Nessuna ulteriore correzione possibile in questa fase.")
+            print(f"  -> Passata {p+1}/{passes}: Nessuna ulteriore correzione possibile.                  ", end='\n')
             break
             
     return id_map
@@ -170,7 +169,6 @@ def _refine_layout(id_map, links_graph, non_locked_ids, distance, refinement_ste
 
     print(f"\n--- Inizio Fase di Rifinitura Globale ({refinement_steps * 1000} tentativi di scambio) ---")
     
-    # CORREZIONE: Unpack di 3 valori invece di 2
     current_avg_dist, current_max_dist, _ = _calculate_total_cost(id_map, links_graph)
     print(f"Stato iniziale: Distanza media: {current_avg_dist:.2f}, Distanza massima: {current_max_dist}")
 
@@ -204,10 +202,11 @@ def _refine_layout(id_map, links_graph, non_locked_ids, distance, refinement_ste
             id_map[orig_id1], id_map[orig_id2] = new_id2, new_id1
             swapped_count += 1
         
-        if i > 0 and i % 50000 == 0:
+        if i > 0 and i % 10000 == 0:
             avg, max_d, _ = _calculate_total_cost(id_map, links_graph)
-            print(f"  ...Rifinitura {i // 1000}k: Dist. media: {avg:.2f}, Dist. max: {max_d}")
+            print(f"  ...Rifinitura {i // 1000}k/{refinement_steps}k: Dist. media: {avg:.2f}, Dist. max: {max_d}   ", end='\r')
 
+    print()
     print(f"--- Fase di Rifinitura Globale completata. Eseguiti {swapped_count} scambi migliorativi. ---")
     return id_map
 
@@ -236,20 +235,18 @@ def _place_passages_in_zone(passages_in_zone, available_ids, distance, id_map, l
         else:
             deferred_passages.append(passage_to_place)
 
+    forced_placements = 0
     if deferred_passages:
-        print(f"--- Rilevato stallo finale. Forzatura del posizionamento per {len(deferred_passages)} capitoli. ---")
+        forced_placements = len(deferred_passages)
         for stuck_passage in deferred_passages:
             stuck_original_id = stuck_passage['original_id']
-            if not available_ids: print(f"Errore critico: no ID per '{stuck_original_id}'."); continue
+            if not available_ids: 
+                print(f"Errore critico: no ID per '{stuck_original_id}'.")
+                continue
             forced_id = available_ids.pop(0)
             id_map[stuck_original_id] = forced_id
-            placed_neighbor_new_ids = {id_map[dest_id] for dest_id in links_graph.get(stuck_original_id, []) if dest_id in id_map}
-            for src_id, linked_ids in links_graph.items():
-                if stuck_original_id in linked_ids and src_id in id_map: placed_neighbor_new_ids.add(id_map[src_id])
-            violating_neighbors_details = [f"capitolo {nid}" for nid in placed_neighbor_new_ids if abs(forced_id - nid) < distance]
-            warning_message = (f"Attenzione: vincolo distanza violato per {stuck_original_id}. Assegnato a {forced_id}")
-            if violating_neighbors_details: warning_message += f", troppo vicino a: {', '.join(violating_neighbors_details)}"
-            print(warning_message)
+    
+    return forced_placements
 
 def _order_zones_intelligently(communities, G):
     """Ordina le zone (community) in base alla loro interconnessione."""
@@ -295,20 +292,30 @@ def _perform_one_renumbering_attempt(passages, distance, locked_ids, start_numbe
             id_map[locked_id] = available_new_ids.pop(0)
             print(f"Capitolo bloccato '{locked_id}' -> assegnato al nuovo ID: {id_map[locked_id]}")
     passages_to_renumber = [p for p in passages if p['original_id'] not in locked_ids]
+    
+    total_forced_placements = 0
     if optimize:
         subgraph_nodes = [p['original_id'] for p in passages_to_renumber]
         subgraph = G.subgraph(subgraph_nodes)
         communities = list(community.greedy_modularity_communities(subgraph))
         ordered_zones = _order_zones_intelligently(communities, G)
+        print(f"Trovate e ordinate {len(ordered_zones)} macro-zone.")
         for i, zone in enumerate(ordered_zones):
             zone_passages = [passage_dict[pid] for pid in zone]
             zone_size, zone_available_ids = len(zone_passages), available_new_ids[:len(zone_passages)]
             available_new_ids = available_new_ids[zone_size:]
             if not zone_available_ids: continue
-            print(f"  - Posizionamento Zona {i+1} ({zone_size} capitoli) nel blocco [{zone_available_ids[0]}...{zone_available_ids[-1]}]")
-            _place_passages_in_zone(zone_passages, zone_available_ids, distance, id_map, links_graph)
+            # Stampa di progresso compatta
+            print(f"  - Posizionamento Zone: {i+1}/{len(ordered_zones)} completato...", end='\r')
+            forced_count = _place_passages_in_zone(zone_passages, zone_available_ids, distance, id_map, links_graph)
+            total_forced_placements += forced_count
+        print() # Vai a capo alla fine del ciclo
     else:
-        _place_passages_in_zone(passages_to_renumber, available_new_ids, distance, id_map, links_graph)
+        total_forced_placements = _place_passages_in_zone(passages_to_renumber, available_new_ids, distance, id_map, links_graph)
+    
+    if total_forced_placements > 0:
+        print(f"  - Avviso: {total_forced_placements} capitoli sono stati forzati a causa di vincoli di distanza minima.")
+
     return id_map, links_graph
 
 def renumber_passages(passages, distance, locked_ids, start_number, optimize, max_dist, attempts, correction_passes, refinement_steps):
