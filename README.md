@@ -5,84 +5,59 @@ Twee2Docx è uno script che converte file .twee (da Twine) in documenti .docx e 
 1. Scopo del Programma
 Twee2Docx nasce per trasformare un file .twee in un documento Word .docx, riorganizzando i capitoli numerati in un ordine casuale, senza rompere i collegamenti tra di essi. È pensato per autori di librigame da stampare.
 
-2. Come Funziona
-Il processo si compone di tre fasi principali:
-
-1. Analisi del file .twee
-Lo script legge il file, ignorando le intestazioni tecniche di Twine.
-
-2. Rinumerazione controllata
-I capitoli vengono rinumerati casualmente, ma seguendo alcune regole:
-
-Casualità: i nuovi numeri non sono sequenziali.
-
-Vincoli opzionali: puoi bloccare alcuni capitoli o stabilire una distanza minima tra quelli collegati.
-
-I rimandi interni vengono aggiornati in automatico in base alla nuova numerazione.
-
-3. Esportazione in .docx
-Viene creato un file .docx con i capitoli rimescolati e numerati.
-È applicata una formattazione che cerca di evitare la divisione di un capitolo tra due pagine.
+, cercando di mantenere i capitoli alla minima  distanza possibile, nei limiti del parametro --distanza
 
 3. Requisiti
-Per usare lo script è necessario avere installato Python e la libreria python-docx.
+Python, python-docx, networkx
 
-Installa la libreria con: pip install python-docx
+pip install python-docx
+pip install networkx
+
+Testato su Windows 11, al momento non ho modo di provare altri os.
 
 4. Come Eseguire lo Script
-Posizionati nella cartella dove si trovano il file ricalcolo.py e il tuo .twee. Poi esegui:
+Posizionati nella cartella dove si trovano il file twee2docx.py e il tuo .twee. Poi esegui:
 
 python twee2docx.py [opzioni]
 
-5. Opzioni Disponibili
-
 --nomefile <nome>
 Cosa fa: indica il nome del file .twee da elaborare (senza l’estensione).
-Default: se non specificato, usa il primo .twee trovato nella cartella.
+Default: se il parametro è omesso usa il primo .twee trovato nella cartella.
 
 --distanza <numero>
-Cosa fa: imposta la distanza minima (in capitoli) tra un nodo e i suoi collegamenti.
-
-Utile per: evitare che un capitolo collegato compaia troppo vicino.
-Default: 5
+Cosa fa: ove possibile imposta la distanza minima (in capitoli) tra un nodo e i suoi collegamenti. Se fallisce dà un warning a console
+Default: se il parametro è omesso, 5
 
 --lock <numeri_dei_capitoli>
 Cosa fa: blocca uno o più capitoli,
-
 Formato: lista separata da virgole o spazi, ad esempio: --lock 1 3 10 o --lock 1,3,10
-Default: se omesso, viene bloccato solo il primo capitolo.
+Default: se il parametro è omesso, viene bloccato solo il primo capitolo.
 
 --debug
 Cosa fa: attiva la modalità debug.
-
 Dopo ogni capitolo verrà inserita una riga in piccolo e corsivo con l’ID originale e i rimandi interni.
-
 Default: disattivato
 
-6. Esempi Pratici
+--no-ottimizza
+Cosa fa: disattiva la modalità di rimescolamento capitoli a zone.
 
-Esecuzione base:
-python twee2docx.py --nomefile storia
-Blocca solo il primo capitolo
+Esempi:
 
-Imposta distanza minima a 5
+**python twee2docx.py --nomefile storia**
 
-Crea il file storia.docx
+Risultato:
+* rimescola i capitoli ma tiene bloccato il primo capitolo (default)
+* Imposta distanza minima tra capitoli a 5 (default)
+* Crea il file storia.docx con il keep together dei capitoli
 
-Bloccare capitoli e aumentare la distanza:
 python twee2docx.py --nomefile storia --distanza 15 --lock 1, 45, 102
-Imposta distanza minima a 15
 
-Blocca i capitoli 1, 45, 102
+* rimescola i capitoli ma tiene bloccati i capitoli 1, 45 e 102
+* Imposta distanza minima tra capitoli a 15
+* Crea il file storia.docx con il keep together dei capitoli
 
-Attivare il debug:
-python twee2docx.py --nomefile storia --debug
-Aggiunge informazioni tecniche in piccolo dopo ogni capitolo
+**python twee2docx.py --nomefile storia --debug**
 
-Tutto insieme:
-python ricalcolo.py --nomefile storia --distanza 10 --lock 1 50 --debug
-Imposta distanza 10
+Dopo ogni capitolo aggiunge in piccolo la numerazione originali di capitolo e link
 
-Blocca i capitoli 1 e 50
-Attiva debug
-Output: storia.docx
+
