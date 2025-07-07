@@ -1,7 +1,7 @@
 # Twee2Docx
 
 
-**Twee2Docx** è uno script che converte file `.twee` (da Twine 2.10 al momento) in documenti `.docx` e rimescola i capitoli in modo casuale, mantenendo intatti i rimandi tra i paragrafi. È pensato per autori di librigame da stampare. Il risultato può variare sensibilmente in base al numero di capitoli.
+`Twee2Docx` è uno script che converte file `.twee` (da Twine 2.10 al momento) in documenti `.docx` e rimescola i capitoli in modo casuale, mantenendo intatti i rimandi tra i paragrafi. È pensato per autori di librigame da stampare. Il risultato può variare sensibilmente in base al numero di capitoli.
 
 | :exclamation: ATTENZIONE          |
 |:---------------------------|
@@ -18,12 +18,11 @@ pip install python-docx
 pip install networkx
 ```
 
-### Come Eseguire lo Script
+### Uso
 
 (Il file `twee2docx.py` e il tuo `.twee` devono essere nella stessa cartella e python deve essere nel path)
-```
-python twee2docx.py [opzioni]
-```
+
+`python twee2docx.py [opzioni]`
 
 `--nomefile <nome_twee_senza_estensione>` : indica il nome del file .twee da elaborare (senza l’estensione). Default: usa il primo `.twee` trovato nella cartella.
 
@@ -48,3 +47,22 @@ Proposta di metodo di lavoro ibrido ideale (da testare): dividere il libro in pa
 python twee2docx.py --nomefile test42 --distanza-min 12 --correzione 30
 ```
 
+# Debug
+
+`debug.py` è uno script che crea un librogame di prova e lo salva in formato `.twee`. E' stato creato con lo scopo di creare file per testare `twee2docx.py`
+
+### Uso
+
+`python debug.py [opzioni]`
+
+`--capitoli <numero>` : definisce il numero di capitoli da creare. Default: `100`
+
+`--tronchi <numero>` : definisce il numero di linee narrative. Default: `3`
+
+`--riunificazioni <numero>` : Imposta il numero di capitoli "ponte" in cui i diversi tronchi narrativi possono convergere prima di procedere verso i finali. Default: `1
+
+`--finali <numero>` : definisce il numero di finali. Default: `3`
+
+`--tronchi <numero>` : definisce il numero di linee narrative. Default: `3`
+
+`--verbose` : attiva la modalità verbosa per mostrare più informazioni in console. Default: `off`
