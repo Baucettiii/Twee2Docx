@@ -38,19 +38,13 @@ python twee2docx.py [opzioni]
 `--correzione <numero>`        : esegue un numero di pass e cerca attivamente lo scambio migliore per risolvere le violazioni di --ditanza-min. Default: `20`
 
 ### Considerazioni
-La velocità di esecuzione dipende dal numero dei capitoli, dai parametri e dalla velocità del processore. Iniziate con parametri relativamente bassi e alzateli per gradi per trovare il vostro sweet spot (esempi di tempi di esecuzione qua sotto)
 
-Risultati in termini di posizionamento: come accennato, non sono ancora riuscito a testarlo seriamente sul vero flusso di un librogioco. Le medie sono accettabili ma ci sono ancora dei picchi che non mi soddisfano ma non sono sicuro se siano fisiologici o se siano migliorabili. Work in progress.
+Risultati in termini di posizionamento: come accennato, non sono ancora riuscito a testarlo seriamente sul vero flusso di un librogioco. Le medie sono accettabili ma ci sono ancora dei picchi che non mi soddisfano. Non sono sicuro se siano fisiologici o se siano migliorabili. Work in progress.
 
 Proposta di metodo di lavoro ibrido ideale (da testare): dividere il libro in parti con 2 o tre capitoli di connessioni tra le parti, bloccare quei capitoli ed effettuare una rinunmerazione per parte.
 
 ### Esempio di script e statistiche:
 ```
-python twee2docx.py --nomefile test42 --distanza-min 12 --correzione 30a
+python twee2docx.py --nomefile test42 --distanza-min 12 --correzione 30
 ```
 
-Esecuzione 200 capitoli su un Intel P9
-
-Rinumerazione completata.  
-- Statistica finale: Distanza media: 29.16, Distanza massima: 164  
-- Tempo di esecuzione totale: 21.93 secondi.
